@@ -137,7 +137,7 @@ describe("$ selector function", function() {
 
 describe("Extra Credit", function () {
   describe("Selector Hierarchy", function (){
-    it("should select the correct elements when the selector includes a child (>) combinator", function () {
+    xit("should select the correct elements when the selector includes a child (>) combinator", function () {
         elements = $('div > img');
         expect(elements.length).toEqual(7);
 
@@ -145,7 +145,7 @@ describe("Extra Credit", function () {
         expect(elements.length).toEqual(0);
     });
 
-    it("should select the correct elements when the selector includes a descendant (whitespace) combinator", function () {
+    xit("should select the correct elements when the selector includes a descendant (whitespace) combinator", function () {
         elements = $('body p');
         expect(elements.length).toEqual(2);
 
