@@ -12,17 +12,14 @@ var traverseDomAndCollectElements = function(matchFunc, startEl=document.body,re
       if(child.children.length){
         traverseDomAndCollectElements(matchFunc,child,resultSet)
       }else{
-        console.log(child)
-        console.log(matchFunc(child))
+        // console.log(child)
+        // console.log(matchFunc(child))
         if(matchFunc(child)) resultSet.push(child)
-        console.log(resultSet)
+        // console.log(resultSet)
       }
     }
     
   } 
-
-
-
   // traverse the DOM tree and collect matching elements in resultSet
   // use matchFunc to identify matching elements
   
@@ -36,16 +33,14 @@ var traverseDomAndCollectElements = function(matchFunc, startEl=document.body,re
 // return one of these types: id, class, tag.class, tag
 
 var selectorTypeMatcher = function(selector) {
-  // your code here
-  let type;
+  if(selector[0]==='#') return'id'
+    else if(selector[0]==='.') return'class'
+    else if(selector.split('.').length==2) return'tag.class'
+    else if(selector.split(' > ').length===2) return 'pTag>cTag'
+    else if(selector.split(' ').length===2) return 'tag desTag'
 
-  if(selector[0]==='#') type= 'id'
-  else if(selector[0]==='.') type= 'class'
-  else if(selector.split('.').length==2) type= 'tag.class'
-  else type='tag'
-  // console.log(selector,'-',type)
-  return type
-}
+    else return 'tag'
+  }
 
 // NOTE ABOUT THE MATCH FUNCTION
 // remember, the returned matchFunction takes an *element* as a
@@ -55,7 +50,6 @@ function classNameIterator(selector,classNames,tagName=null){
   for(className of classNames){
     className= '.'+className.toLowerCase()
     if(tagName) className= tagName.toLowerCase()+className //period is already added
-    
     // if(selector==='.photo') console.log(selector, className, selector===className)
     if(selector.toLowerCase()===className){
       return true
@@ -87,10 +81,50 @@ var matchFunctionMaker = function(selector) {
         return el.tagName && el.className&&(classNameIterator(selector,classNames,el.tagName))
       }
 
-    } else if (selectorType === "tag") {
+    }else if(selectorType=== 'pTag>cTag'){
+        matchFunction=function(el){
+          console.log(`SELECTOR ${selector}`)
+          console.log(`parentTag ${el.parentNode.tagName} descTag ${el.tagName}`)
+          console.log(`${el.parentNode.tagName.toLowerCase()} > ${el.tagName.toLowerCase()}`)
+          
+          return el.parentNode.tagName&& el.tagName &&
+          (`${el.parentNode.tagName.toLowerCase()} > ${el.tagName.toLowerCase()}`===selector.toLowerCase())
+        }
+      }else if(selectorType==='tag desTag'){
+         matchFunction=function(el){
+           let parentNode= el.parentNode
+           let selectorArr= selector.split(' ')
+          
+           var elMatch = el.tagName && el.tagName.toLowerCase()===selectorArr[1]
+           
+           while(parentNode&&elMatch){
+            var parentMatch =parentNode.tagName && parentNode.tagName.toLowerCase()===selectorArr[0]
+
+            console.log(parentNode.tagName, el.tagName)
+            
+             if(parentMatch&&parentNode.contains(el)){
+               return true
+               
+             }else parentNode=parentNode.parentNode
+             
+           }
+
+          // var bool =  el.parentNode.tagName&&el.tagName 
+          // // && (`${el.parentNode.tagName.toLowerCase()} ${el.tagName.toLowerCase()}`===selector.toLowerCase())
+          // &&parentNode.contains(el)
+
+          // console.log(bool)
+          // return bool
+         }
+
+       
+
+        // return el.tagName&&(el.tagName.to)
+      }else if (selectorType === "tag") {
       matchFunction = function (el) {
         return el.tagName && (el.tagName.toLowerCase() === selector.toLowerCase())
       }
+      
 
     }
     return matchFunction;
@@ -102,3 +136,7 @@ var $ = function(selector) {
   elements = traverseDomAndCollectElements(selectorMatchFunc);
   return elements;
 };
+
+
+
+  
